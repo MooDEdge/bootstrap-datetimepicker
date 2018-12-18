@@ -1,3 +1,12 @@
+/*
+    This is a fork of version 4.17.37 of bootstrap-datetimepicker with some changes made by mood.
+    These changes are tracked in the following branch off of bootstrap-datetimepicker here:
+
+        https://github.com/MooDEdge/bootstrap-datetimepicker/tree/mood_4.17.37
+
+    Please make any changes on this branch and then keep them in track in this file.
+*/
+
 /*! version : 4.17.37
  =========================================================
  bootstrap-datetimejs
