@@ -471,9 +471,9 @@
                 }
 
                 widget.css({
-                    top: vertical === 'top' ? 'auto' : position.top + element.outerHeight(),
-                    bottom: vertical === 'top' ? position.top + element.outerHeight() : 'auto',
-                    left: horizontal === 'left' ? (parent === element ? 0 : position.left) : 'auto',
+                    top: vertical === 'top' ? 'auto' : element.offset().top + element.height() + 11,
+                    bottom: vertical === 'top' ? $(window).height() - element.offset().top + 6 : 'auto',
+                    left: horizontal === 'left' ? element.offset().left : 'auto',
                     right: horizontal === 'left' ? 'auto' : parent.outerWidth() - element.outerWidth() - (parent === element ? 0 : position.left)
                 });
             },
@@ -1002,17 +1002,16 @@
                 },
 
                 selectDay: function (e) {
-                    var day = viewDate.clone();
+                    var day = parseInt($(e.target).text(), 10);
+
                     if ($(e.target).is('.old')) {
-                        day.subtract(1, 'M');
+                        viewDate.subtract(1, 'M');
                     }
                     if ($(e.target).is('.new')) {
-                        day.add(1, 'M');
+                        viewDate.add(1, 'M');
                     }
-                    setValue(day.date(parseInt($(e.target).text(), 10)));
-                    if (!hasTime() && !options.keepOpen && !options.inline) {
-                        hide();
-                    }
+                    viewDate.date(day);
+                    viewUpdate('D');
                 },
 
                 incrementHours: function () {
@@ -1020,6 +1019,10 @@
                     if (isValid(newDate, 'h')) {
                         setValue(newDate);
                     }
+
+                    notifyEvent({
+                        type: 'dp.changeHour',
+                    });
                 },
 
                 incrementMinutes: function () {
@@ -1027,6 +1030,10 @@
                     if (isValid(newDate, 'm')) {
                         setValue(newDate);
                     }
+
+                    notifyEvent({
+                        type: 'dp.changeMinute',
+                    });
                 },
 
                 incrementSeconds: function () {
@@ -1041,6 +1048,10 @@
                     if (isValid(newDate, 'h')) {
                         setValue(newDate);
                     }
+
+                    notifyEvent({
+                        type: 'dp.changeHour',
+                    });
                 },
 
                 decrementMinutes: function () {
@@ -1048,6 +1059,10 @@
                     if (isValid(newDate, 'm')) {
                         setValue(newDate);
                     }
+
+                    notifyEvent({
+                        type: 'dp.changeMinute',
+                    });
                 },
 
                 decrementSeconds: function () {
@@ -1129,11 +1144,18 @@
                     }
                     setValue(date.clone().hours(hour));
                     actions.showPicker.call(picker);
+
+                    notifyEvent({
+                        type: 'dp.changeHour',
+                    });
                 },
 
                 selectMinute: function (e) {
                     setValue(date.clone().minutes(parseInt($(e.target).text(), 10)));
                     actions.showPicker.call(picker);
+                    notifyEvent({
+                        type: 'dp.changeMinute',
+                    });
                 },
 
                 selectSecond: function (e) {
@@ -1186,7 +1208,8 @@
                     return picker;
                 }
                 if (input.val() !== undefined && input.val().trim().length !== 0) {
-                    setValue(parseInputDate(input.val().trim()));
+                    // This is where the original date was set and displayed, this is now overridden
+                    // setValue(parseInputDate(input.val().trim()));
                 } else if (options.useCurrent && unset && ((input.is('input') && input.val().trim().length === 0) || options.inline)) {
                     currentMoment = getMoment();
                     if (typeof options.useCurrent === 'string') {
@@ -1319,7 +1342,7 @@
 
                 if (element.is('input')) {
                     input.on({
-                        'focus': show
+                        'focus': options.allowInputToggle ? show : '',
                     });
                 } else if (component) {
                     component.on('click', toggle);
